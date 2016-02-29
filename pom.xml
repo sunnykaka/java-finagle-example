@@ -20,7 +20,7 @@
         <slf4j.version>1.6.4</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
         <finagle.version>6.33.0</finagle.version>
-        <warExplodedDirectory>target/exploded/${artifactId}.war</warExplodedDirectory>
+        <warExplodedDirectory>target/exploded/${project.artifactId}.war</warExplodedDirectory>
     </properties>
 
     <build>
@@ -54,6 +54,42 @@
                 <configuration>
                     <skipTests>true</skipTests>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.twitter</groupId>
+                <artifactId>scrooge-maven-plugin</artifactId>
+                <version>4.5.0</version>
+                <configuration>
+                    <thriftNamespaceMappings>
+                        <thriftNamespaceMapping>
+                            <from>com.twitter.demo</from>
+                            <to>com.twitter.mydemo.renamed</to>
+                        </thriftNamespaceMapping>
+                    </thriftNamespaceMappings>
+                    <language>scala</language> <!-- default is scala -->
+                    <thriftOpts>
+                        <!-- add other Scrooge command line options using thriftOpts -->
+                        <thriftOpt>--finagle</thriftOpt>
+                    </thriftOpts>
+                    <!-- tell scrooge to not to build the extracted thrift files (defaults to true) -->
+                    <buildExtractedThrift>false</buildExtractedThrift>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>thrift-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>thrift-test-sources</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -92,7 +128,7 @@
         <dependency>
             <groupId>org.apache.thrift</groupId>
             <artifactId>libthrift</artifactId>
-            <version>0.9.3</version>
+            <version>0.5.0-1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -110,19 +146,56 @@
     <repositories>
         <repository>
             <id>scala-tools.org</id>
-            <name>Scala-tools Maven2 Repository</name>
             <url>http://scala-tools.org/repo-releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <updatePolicy>always</updatePolicy>
+            </releases>
         </repository>
         <repository>
             <id>twitter</id>
             <url>http://maven.twttr.com/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <updatePolicy>always</updatePolicy>
+            </releases>
         </repository>
         <repository>
             <id>mvnrepository</id>
             <url>http://mvnrepository.com/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <updatePolicy>always</updatePolicy>
+            </releases>
         </repository>
     </repositories>
-
-
+    <pluginRepositories>
+        <pluginRepository>
+            <id>mvnrepository</id>
+            <url>http://mvnrepository.com/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+        </pluginRepository>
+        <pluginRepository>
+            <id>twitter</id>
+            <url>http://maven.twttr.com/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>
