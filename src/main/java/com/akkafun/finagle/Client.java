@@ -10,7 +10,6 @@ import com.twitter.io.Reader$;
 import com.twitter.util.Await;
 import com.twitter.util.Future;
 import com.twitter.util.TimeoutException;
-import scala.runtime.AbstractFunction0;
 import scala.runtime.BoxedUnit;
 
 import java.io.ByteArrayInputStream;
@@ -45,6 +44,7 @@ public class Client {
         }));
         responseFuture.ensure(func(() -> {
             service.close();
+            //IDE may complain here, just ignore
             return BoxedUnit.UNIT;
         }));
         /**
