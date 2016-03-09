@@ -1,24 +1,37 @@
 package com.akkafun.finagle
 
-import com.akkafun.service.thrift.DemoService
-import com.twitter.finagle.Thrift
-import com.twitter.util.{Await, Futures, Future}
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
+
+import com.twitter.finagle.Http
+import com.twitter.finagle.http.Method.Post
+import com.twitter.finagle.http.Request
+import com.twitter.finagle.http.Version.Http11
+import com.twitter.finagle.stats.DefaultStatsReceiver
+import com.twitter.finagle.zipkin.thrift.ZipkinTracer
+import com.twitter.io.Reader
+import com.twitter.util.Await
 
 /**
   * Created by liubin on 2016/3/1.
   */
 object ScalaClient extends App{
 
-  val client = Thrift.newIface[DemoService[Future]]("127.0.0.1:8081")
+  val service = Http.client.
+    withLabel("echo-client").
+    withTracer(ZipkinTracer.mk("192.168.99.100", 9410, DefaultStatsReceiver, 1.0f)).
+    newService("127.0.0.1:8081");
 
-  val f1 = client.method1()
-  val f2 = client.method2(1, 2)
-  val f3 = client.method3()
+  //create a "Greetings!" request.
+  val data = Reader.fromStream(new ByteArrayInputStream("Greetings!".getBytes(StandardCharsets.UTF_8)));
+  val request = Request(Http11, Post, "/", data);
 
-  val result = Futures.join(f1, f2, f3)
-
-  Await.ready(result).onSuccess {
-    case (r1, r2, r3) => println(s"r1: $r1, r2: $r2, r3: $r3")
-  }.onFailure(e => println("error: " + e))
+  Await.ready(service(request)) onSuccess {response =>
+    println(s"response status: ${response.status}, response string: ${response.contentString}")
+  } onFailure {e =>
+    println("error: " + e.toString)
+  } ensure {
+    service.close()
+  }
 
 }
