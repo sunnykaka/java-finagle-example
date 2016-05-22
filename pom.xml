@@ -150,6 +150,16 @@
         </dependency>
         <dependency>
             <groupId>com.twitter</groupId>
+            <artifactId>finagle-serversets_2.11</artifactId>
+            <version>${finagle.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twitter</groupId>
+            <artifactId>finagle-zipkin_2.11</artifactId>
+            <version>${finagle.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.twitter</groupId>
             <artifactId>scrooge-core_2.11</artifactId>
             <version>4.7.0</version>
         </dependency>
